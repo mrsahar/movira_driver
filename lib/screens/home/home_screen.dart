@@ -1,116 +1,94 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:movira_driver/screens/home/history/widget/ride_history_card.dart';
-import 'package:movira_driver/screens/messages/notification_screen.dart';
-import 'package:movira_driver/screens/ridebooking/ride_booking_screen.dart';
+import 'package:movira_driver/screens/home/widget/earnings_stats_card.dart';
+import 'package:movira_driver/screens/home/widget/reject_request_bottom_sheet.dart';
+import 'package:movira_driver/screens/home/widget/ride_request_card.dart';
 import 'package:movira_driver/utils/constants/colors.dart';
 import 'package:movira_driver/utils/text_style.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
-class HomeTabScreen extends StatefulWidget {
-  const HomeTabScreen({super.key});
+class DriverHomeScreen extends StatefulWidget {
+  const DriverHomeScreen({super.key});
 
   @override
-  State<HomeTabScreen> createState() => _HomeTabScreenState();
+  State<DriverHomeScreen> createState() => _DriverHomeScreenState();
 }
 
-class _HomeTabScreenState extends State<HomeTabScreen> {
-  bool _isOngoingDeliveryExpanded = false;
+class _DriverHomeScreenState extends State<DriverHomeScreen> {
+  bool _isOnline = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
+        preferredSize: const Size.fromHeight(65),
         child: AppBar(
           backgroundColor: AppColors.white,
-          elevation: 0,
+          elevation: 4,
           automaticallyImplyLeading: false,
           centerTitle: false,
           titleSpacing: 16,
-          title: GestureDetector(
-            onTap: () {
-              setState(() {
-                _isOngoingDeliveryExpanded = !_isOngoingDeliveryExpanded;
-              });
-            },
-            child: Row(
-              children: [
-                // Profile Image
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    'assets/images/user.png',
-                    width: 48,
-                    height: 48,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: AppColors.greyLight,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          Icons.person,
-                          color: AppColors.textSecondary,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-
-                const SizedBox(width: 12),
-
-                // Name and Location
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Jacob Jones',
-                        style: AppTextStyles.bodyLarge.copyWith(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
+          title: Row(
+            children: [
+              // Profile Image
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  'assets/images/user.png',
+                  width: 48,
+                  height: 48,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: AppColors.greyLight,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          Text(
-                            'Naperville, USA',
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.textSecondary,
-                              fontSize: 13,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          AnimatedRotation(
-                            duration: const Duration(milliseconds: 300),
-                            turns: _isOngoingDeliveryExpanded ? 0.5 : 0,
-                            child: Icon(
-                              Icons.keyboard_arrow_down,
-                              size: 18,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
+                      child: Icon(
+                        Icons.person,
+                        color: AppColors.textSecondary,
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
-              ],
-            ),
+              ),
+
+              const SizedBox(width: 12),
+
+              // Name and Location
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Bessie Cooper',
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '4140 Parker Rd, Mexico 31134',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.textSecondary,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           actions: [
             // Notification Bell
             Center(
               child: Container(
-                height: 35,
-                width: 35,
+                height: 40,
+                width: 40,
                 margin: const EdgeInsets.only(right: 16),
                 decoration: BoxDecoration(
                   color: AppColors.primaryLight,
@@ -121,11 +99,10 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                   icon: Icon(
                     Icons.notifications,
                     color: AppColors.black,
-                    size: 18,
+                    size: 20,
                   ),
                   onPressed: () {
                     // Navigate to notifications
-                    Get.to(NotificationScreen());
                   },
                 ),
               ),
@@ -135,159 +112,81 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
       ),
       body: Column(
         children: [
-          // Ongoing Delivery Section (Expandable)
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            height: _isOngoingDeliveryExpanded ? 110 : 0,
-            child: _isOngoingDeliveryExpanded
-                ? GestureDetector(
-              onTap: () {
-                // Navigate to location/tracking screen
-                print('Navigate to ongoing delivery details');
-              },
-              child: Container(
-                color: AppColors.black,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                child: Column(
-                  children: [
-                    // Header with "Ongoing Delivery" and Time
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.local_shipping,
-                          color: Colors.green.shade400,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Ongoing Delivery',
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: Colors.green.shade400,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                          ),
-                        ),
-                        const Spacer(),
-                        Icon(
-                          Icons.access_time,
-                          color: AppColors.white,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          '12:24',
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.white,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Pickup and Drop-off Locations
-                    Row(
-                      children: [
-                        // Pickup
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Pickup',
-                                style: AppTextStyles.bodySmall.copyWith(
-                                  color: AppColors.white.withValues(alpha: 0.7),
-                                  fontSize: 12,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Lomas de Zamora, Mex...',
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.white,
-                                  fontSize: 12,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Dotted line with arrow
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 6,
-                                height: 6,
-                                decoration: BoxDecoration(
-                                  color: AppColors.white.withValues(alpha: 0.5),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              ...List.generate(
-                                8,
-                                    (index) => Container(
-                                  width: 4,
-                                  height: 1,
-                                  margin: const EdgeInsets.symmetric(horizontal: 2),
-                                  color: AppColors.white.withValues(alpha: 0.5),
-                                ),
-                              ),
-                              Icon(
-                                Icons.arrow_forward,
-                                color: AppColors.white.withValues(alpha: 0.5),
-                                size: 14,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Drop-off
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                'Drop Off',
-                                style: AppTextStyles.bodySmall.copyWith(
-                                  color: AppColors.white.withValues(alpha: 0.7),
-                                  fontSize: 12,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'North Las Vegas (NV), Gua...',
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.white,
-                                  fontSize: 12,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.right,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+          // Change Status Section - Attached to AppBar
+          ClipRRect(
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(12),
+              bottomRight: Radius.circular(12),
+            ),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 16,
               ),
-            )
-                : const SizedBox.shrink(),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.black.withOpacity(0.05),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Change Status',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.black,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _isOnline ? 'Online' : 'Offline',
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          color: _isOnline ? Colors.green : Colors.red.shade600,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Transform.scale(
+                    scale: 0.75, // Adjust this value to make it smaller or larger
+                    child: Switch(
+                      value: _isOnline,
+                      onChanged: (value) {
+                        setState(() {
+                          _isOnline = value;
+                        });
+                      },
+                      activeThumbColor: Colors.green,
+                      activeTrackColor: Colors.green.shade100,
+                      inactiveThumbColor: AppColors.textSecondary,
+                      inactiveTrackColor: AppColors.greyLight,
+                    ),
+                  )
+                  ,
+                ],
+              ),
+            ),
           ),
 
           // Main Content
           Expanded(
             child: Container(
-              width: double.infinity,
               decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage('assets/images/bg.png'),
@@ -300,245 +199,158 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Where to? Card
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          image: const DecorationImage(
-                            image: AssetImage('assets/images/bg_gold.png'),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Title
-                              Text(
-                                'Where to?',
-                                style: AppTextStyles.h3.copyWith(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                      // Earnings Card
+                      EarningsStatsCard(
+                        todayEarnings: '\$32',
+                        inProgressDeliveries: 56,
+                        completedDeliveries: 46,
+                        onTap: () {
+                          // Navigate to earnings details
+                        },
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Show content based on online/offline status
+                      if (_isOnline) ...[
+                        // All Requests Header
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'All Requests (2)',
+                              style: AppTextStyles.h5.copyWith(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
                               ),
-
-                              const SizedBox(height: 20),
-
-                              // Location Fields Container
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Left side with icons and line
-                                Column(
-                                  children: [
-                                    Container(
-                                      width: 2,
-                                      margin: const EdgeInsets.symmetric(vertical: 10),
-                                      color: AppColors.transparent,
-                                    ),
-                                    // Pickup location icon - Using SVG
-                                    SvgPicture.asset(
-                                      'assets/icons/location.svg',
-                                      width: 18,
-                                      height: 18,
-                                      colorFilter: ColorFilter.mode(
-                                        AppColors.black,
-                                        BlendMode.srcIn,
-                                      ),
-                                    ),
-                                    // Connecting line
-                                    Container(
-                                      width: 2,
-                                      height: 40,
-                                      margin: const EdgeInsets.symmetric(vertical: 12),
-                                      color: AppColors.black.withValues(alpha: 0.3),
-                                    ),
-                                    // Drop-off GPS icon (crosshair)
-                                    SvgPicture.asset(
-                                      'assets/icons/gps.svg',
-                                      width: 18,
-                                      height: 18,
-                                      colorFilter: ColorFilter.mode(
-                                        AppColors.black,
-                                        BlendMode.srcIn,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                const SizedBox(width: 12),
-
-                                // Right side - Single white container with both fields
-                                Expanded(
-                                  child: Container(
-                                    padding: const EdgeInsets.all(14),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.white,
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        // Pickup Location Field
-                                        GestureDetector(
-                                          onTap: () {
-                                            // Navigate to location picker for pickup
-                                            Get.to(RideBookingScreen());
-                                            print('Open pickup location picker');
-                                          },
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  'Choose Pickup Location',
-                                                  style: AppTextStyles.bodyMedium.copyWith(
-                                                    color: AppColors.black,
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              ),
-                                              IconButton(
-                                                padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
-                                                onPressed: () {
-                                                  // Navigate to location picker for pickup
-                                                  Get.to(RideBookingScreen());
-                                                  print('Open pickup location picker');
-                                                },
-                                                icon: SvgPicture.asset(
-                                                  'assets/icons/location_pin.svg',
-                                                  width: 18,
-                                                  height: 18,
-                                                  colorFilter: ColorFilter.mode(
-                                                    AppColors.black,
-                                                    BlendMode.srcIn,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-
-                                        // Divider
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 10),
-                                          child: Divider(
-                                            color: AppColors.greyLight,
-                                            height: 1,
-                                          ),
-                                        ),
-
-                                        // Drop-off Location Field
-                                        GestureDetector(
-                                          onTap: () {
-                                            // Navigate to location picker for drop-off
-                                            Get.to(RideBookingScreen());
-                                            print('Open drop-off location picker');
-                                          },
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  'Choose Drop-Off Location',
-                                                  style: AppTextStyles.bodyMedium.copyWith(
-                                                    color: AppColors.black,
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              ),
-                                              IconButton(
-                                                padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
-                                                onPressed: () {
-                                                  // Navigate to location picker for drop-off
-                                                  Get.to(RideBookingScreen());
-                                                  print('Open drop-off location picker');
-                                                },
-                                                icon: SvgPicture.asset(
-                                                  'assets/icons/location_pin.svg',
-                                                  width: 18,
-                                                  height: 18,
-                                                  colorFilter: ColorFilter.mode(
-                                                    AppColors.black,
-                                                    BlendMode.srcIn,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
                             ),
-
-                              const SizedBox(height: 24),
-
-                              // Book Now Button
-                              Center(
-                                child: SizedBox(
-                                  width: 180,
-                                  height: 48,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      // Navigate to booking
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.black,
-                                      foregroundColor: AppColors.primary,
-                                      elevation: 0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(24),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'Book Now',
-                                      style: AppTextStyles.button.copyWith(
-                                        color: AppColors.primary,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                            GestureDetector(
+                              onTap: () {
+                                // Navigate to all requests
+                              },
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'View All',
+                                    style: AppTextStyles.bodyMedium.copyWith(
+                                      color: Colors.orange,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 13,
                                     ),
                                   ),
+                                  const SizedBox(width: 4),
+                                  Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: Colors.orange,
+                                    size: 14,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Request Card 1
+                        RideRequestCard(
+                          name: 'Marvin McKinney',
+                          image: 'assets/images/profile_user.png',
+                          price: '\$65',
+                          bookingType: 'Booked for rider',
+                          pickupLocation: 'Maryland bustop, Anthony Ikeja',
+                          dropLocation:
+                          '6391 Elgin St, Celina, Delaware 10299',
+                          timerSeconds: 109,
+                          onAccept: () {
+                            print('Accepted ride');
+                          },
+                          onReject: () {
+                            Get.bottomSheet(
+                              RejectRequestBottomSheet(
+                                onSubmit: () {
+                                  print('Request rejected with reason');
+                                  // Handle rejection logic
+                                },
+                              ),
+                              backgroundColor: Colors.transparent,
+                              isScrollControlled: true,
+                            );
+                          },
+                          onTimerExpired: () {
+                            print('Timer expired');
+                          },
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Request Card 2
+                        RideRequestCard(
+                          name: 'Savannah Nguyen',
+                          image: 'assets/images/profile_user.png',
+                          price: '\$65',
+                          bookingType: 'Booked for parcel',
+                          pickupLocation: 'Maryland bustop, Anthony Ikeja',
+                          dropLocation:
+                          '6391 Elgin St, Celina, Delaware 10299',
+                          timerSeconds: 59,
+                          onAccept: () {
+                            print('Accepted parcel delivery');
+                          },
+                          onReject: () {
+                            Get.bottomSheet(
+                              RejectRequestBottomSheet(
+                                onSubmit: () {
+                                  print('Request rejected with reason');
+                                  // Handle rejection logic
+                                },
+                              ),
+                              backgroundColor: Colors.transparent,
+                              isScrollControlled: true,
+                            );
+                          },
+                          onTimerExpired: () {
+                            print('Timer expired for parcel');
+                          },
+                        ),
+                      ] else ...[
+                        // Offline Message
+                        Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const SizedBox(height: 40),
+                              Image.asset(
+                                'assets/images/offline.png',
+                                width: 200,
+                                height: 200,
+                              ),
+                              const SizedBox(height: 24),
+                              Text(
+                                'You are offline now!',
+                                style: AppTextStyles.h4.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 12),
+                              Padding(
+                                padding:
+                                const EdgeInsets.symmetric(horizontal: 40),
+                                child: Text(
+                                  'You don\'t have booking requests as you are offline now, Go online to get ride requests.',
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 13,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-
-                      const SizedBox(height: 32),
-
-                      // Recent Activity Title
-                      Text(
-                        'Recent Activity',
-                        style: AppTextStyles.h4.copyWith(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Recent Activity Card - Using RideHistoryCard widget
-                      RideHistoryCard(
-                        driverName: 'Marvin McKinney',
-                        driverImage: 'assets/images/profile_user.png',
-                        driverRating: 4.5,
-                        carModel: 'Chevrolet Tornado',
-                        carPlate: 'ES-345-IJ5',
-                        pickupLocation: 'Lomas de Zamora, Mexico City',
-                        dropLocation: 'North Las Vegas (NV), Guanajuato',
-                        duration: '30 mins',
-                        distance: '14.2 KM',
-                        price: '\$120.00',
-                        statusText: 'Booked ride to travel.',
-                        status: RideStatus.inProgress,
-                      ),
+                      ],
 
                       const SizedBox(height: 100),
                     ],

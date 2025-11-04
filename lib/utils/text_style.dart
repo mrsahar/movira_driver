@@ -29,6 +29,11 @@ class AppTextStyles {
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
   );
+  static TextStyle h5 = GoogleFonts.outfit(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
 
   // Body
   static TextStyle bodyLarge = GoogleFonts.outfit(

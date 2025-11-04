@@ -1,56 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:movira_driver/screens/authentication/vehicle_information_screen.dart';
 import 'package:movira_driver/screens/payment/card_add_screen.dart';
 import 'package:movira_driver/utils/constants/colors.dart';
 import 'package:movira_driver/utils/text_style.dart';
 import 'package:movira_driver/utils/widgets/my_app_bar.dart';
 import 'package:movira_driver/utils/widgets/my_text_box.dart';
 
-class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
+import 'document_upload_screen.dart';
+
+class VehicleInformationScreen extends StatefulWidget {
+  const VehicleInformationScreen({super.key});
 
   @override
-  State<EditProfileScreen> createState() => _EditProfileScreenState();
+  State<VehicleInformationScreen> createState() =>
+      _VehicleInformationScreenState();
 }
 
-class _EditProfileScreenState extends State<EditProfileScreen> {
+class _VehicleInformationScreenState extends State<VehicleInformationScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
-  final _mobileController = TextEditingController();
+  final _modelController = TextEditingController();
+  final _yearController = TextEditingController();
+  final _plateNumberController = TextEditingController();
+  final _ssnController = TextEditingController();
 
-  String? _selectedCountry;
-  String? _selectedGender;
-  int _currentStep = 0;
+  String? _selectedVehicleType;
+  String? _selectedVehicleBrand;
+  int _currentStep = 1;
   final int _totalSteps = 3;
 
-
-  final List<String> _countries = [
-    'United States',
-    'United Kingdom',
-    'Canada',
-    'Australia',
-    'India',
-    'Pakistan',
+  final List<String> _vehicleTypes = [
+    'Sedan',
+    'SUV',
+    'Hatchback',
+    'Truck',
+    'Van',
+    'Coupe',
   ];
 
-  final List<String> _genders = [
-    'Male',
-    'Female',
-    'Other',
+  final List<String> _vehicleBrands = [
+    'Toyota',
+    'Honda',
+    'Ford',
+    'BMW',
+    'Mercedes',
+    'Audi',
+    'Nissan',
+    'Hyundai',
   ];
 
   @override
   void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    _mobileController.dispose();
+    _modelController.dispose();
+    _yearController.dispose();
+    _plateNumberController.dispose();
+    _ssnController.dispose();
     super.dispose();
   }
 
-  void _showCountryPicker() {
+  void _showVehicleTypePicker() {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.white,
@@ -64,25 +72,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Select Country',
+                'Select Vehicle Type',
                 style: AppTextStyles.h4,
               ),
               const SizedBox(height: 20),
               Flexible(
                 child: ListView.builder(
                   shrinkWrap: true,
-                  itemCount: _countries.length,
+                  itemCount: _vehicleTypes.length,
                   itemBuilder: (context, index) {
                     return ListTile(
                       title: Text(
-                        _countries[index],
+                        _vehicleTypes[index],
                         style: AppTextStyles.bodyMedium.copyWith(
                           color: AppColors.black,
                         ),
                       ),
                       onTap: () {
                         setState(() {
-                          _selectedCountry = _countries[index];
+                          _selectedVehicleType = _vehicleTypes[index];
                         });
                         Navigator.pop(context);
                       },
@@ -97,7 +105,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  void _showGenderPicker() {
+  void _showVehicleBrandPicker() {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.white,
@@ -111,24 +119,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Select Gender',
+                'Select Vehicle Brand',
                 style: AppTextStyles.h4,
               ),
               const SizedBox(height: 20),
-              ...List.generate(
-                _genders.length,
-                    (index) => ListTile(
-                  title: Text(
-                    _genders[index],
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.black,
-                    ),
-                  ),
-                  onTap: () {
-                    setState(() {
-                      _selectedGender = _genders[index];
-                    });
-                    Navigator.pop(context);
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _vehicleBrands.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(
+                        _vehicleBrands[index],
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.black,
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          _selectedVehicleBrand = _vehicleBrands[index];
+                        });
+                        Navigator.pop(context);
+                      },
+                    );
                   },
                 ),
               ),
@@ -144,7 +157,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: const MAppBar(
-        title: 'Complete Your Profile',
+        title: 'Vehicle Information',
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -160,103 +173,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: Form(
                 key: _formKey,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 20),
 
-                    // Profile Picture
-                    Stack(
-                      children: [
-                        Container(
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            color: AppColors.greyLight,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: SvgPicture.asset(
-                              'assets/icons/profile.svg',
-                              width: 60,
-                              height: 60,
-                              colorFilter: ColorFilter.mode(
-                                AppColors.white,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: GestureDetector(
-                            onTap: () {
-                              // Handle image picker
-                            },
-                            child: Container(
-                              width: 36,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                color: AppColors.primary,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: SvgPicture.asset(
-                                  'assets/icons/plus.svg',
-                                  width: 20,
-                                  height: 20,
-                                  colorFilter: ColorFilter.mode(
-                                    AppColors.black,
-                                    BlendMode.srcIn,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 40),
-
-                    // First Name
-                    MTextField(
-                      label: 'First Name',
-                      hintText: 'Enter first name',
-                      iconPath: 'assets/icons/profile.svg',
-                      controller: _firstNameController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your first name';
-                        }
-                        return null;
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Last Name
-                    MTextField(
-                      label: 'Last Name',
-                      hintText: 'Enter last name',
-                      iconPath: 'assets/icons/profile.svg',
-                      controller: _lastNameController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your last name';
-                        }
-                        return null;
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Country Dropdown
+                    // Vehicle Type Dropdown
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Country',
+                          'Vehicle Type',
                           style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.black,
                             fontWeight: FontWeight.w500,
@@ -264,7 +190,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                         const SizedBox(height: 8),
                         GestureDetector(
-                          onTap: _showCountryPicker,
+                          onTap: _showVehicleTypePicker,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 20,
@@ -280,21 +206,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             ),
                             child: Row(
                               children: [
-                                SvgPicture.asset(
-                                  'assets/icons/global.svg',
-                                  width: 20,
-                                  height: 20,
-                                  colorFilter: ColorFilter.mode(
-                                    AppColors.textSecondary,
-                                    BlendMode.srcIn,
-                                  ),
-                                ),
-                                const SizedBox(width: 14),
                                 Expanded(
                                   child: Text(
-                                    _selectedCountry ?? 'Select country',
+                                    _selectedVehicleType ?? 'Select vehicle type',
                                     style: AppTextStyles.bodyMedium.copyWith(
-                                      color: _selectedCountry != null
+                                      color: _selectedVehicleType != null
                                           ? AppColors.black
                                           : AppColors.textSecondary,
                                     ),
@@ -318,29 +234,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                     const SizedBox(height: 16),
 
-                    // Mobile Number
-                    MTextField(
-                      label: 'Mobile Number',
-                      hintText: 'Enter number',
-                      iconPath: 'assets/icons/call.svg',
-                      controller: _mobileController,
-                      keyboardType: TextInputType.phone,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your mobile number';
-                        }
-                        return null;
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Gender Dropdown
+                    // Vehicle Brand Dropdown
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Gender',
+                          'Vehicle Brand',
                           style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.black,
                             fontWeight: FontWeight.w500,
@@ -348,7 +247,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                         const SizedBox(height: 8),
                         GestureDetector(
-                          onTap: _showGenderPicker,
+                          onTap: _showVehicleBrandPicker,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 20,
@@ -364,21 +263,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             ),
                             child: Row(
                               children: [
-                                SvgPicture.asset(
-                                  'assets/icons/gender.svg',
-                                  width: 20,
-                                  height: 20,
-                                  colorFilter: ColorFilter.mode(
-                                    AppColors.textSecondary,
-                                    BlendMode.srcIn,
-                                  ),
-                                ),
-                                const SizedBox(width: 14),
                                 Expanded(
                                   child: Text(
-                                    _selectedGender ?? 'Select gender',
+                                    _selectedVehicleBrand ?? 'Enter vehicle brand',
                                     style: AppTextStyles.bodyMedium.copyWith(
-                                      color: _selectedGender != null
+                                      color: _selectedVehicleBrand != null
                                           ? AppColors.black
                                           : AppColors.textSecondary,
                                     ),
@@ -398,9 +287,77 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                         ),
                       ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Model
+                    MTextField(
+                      label: 'Model',
+                      hintText: 'Enter your vehicle model',
+                      iconPath: 'assets/icons/car.svg',
+                      controller: _modelController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your vehicle model';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Make model year
+                    MTextField(
+                      label: 'Make model year',
+                      hintText: 'Enter the year',
+                      iconPath: 'assets/icons/calendar.svg',
+                      controller: _yearController,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter the year';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Vehicle Plate Number
+                    MTextField(
+                      label: 'Vehicle Plate Number',
+                      hintText: 'Enter vehicle plate number',
+                      iconPath: 'assets/icons/plate.svg',
+                      controller: _plateNumberController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter vehicle plate number';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Social security number
+                    MTextField(
+                      label: 'Social security number',
+                      hintText: 'Enter social security number',
+                      iconPath: 'assets/icons/security.svg',
+                      controller: _ssnController,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter social security number';
+                        }
+                        return null;
+                      },
                     ),
 
                     const SizedBox(height: 30),
+
+                    // Progress Indicators
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(
@@ -418,6 +375,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 30),
 
                     // Continue Button
@@ -427,11 +385,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: ElevatedButton(
                         onPressed: () {
                           // if (_formKey.currentState!.validate()) {
-                          //   if (_selectedCountry == null) {
+                          //   if (_selectedVehicleType == null) {
                           //     ScaffoldMessenger.of(context).showSnackBar(
                           //       SnackBar(
                           //         content: Text(
-                          //           'Please select a country',
+                          //           'Please select a vehicle type',
                           //           style: AppTextStyles.bodyMedium.copyWith(
                           //             color: AppColors.white,
                           //           ),
@@ -441,11 +399,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           //     );
                           //     return;
                           //   }
-                          //   if (_selectedGender == null) {
+                          //   if (_selectedVehicleBrand == null) {
                           //     ScaffoldMessenger.of(context).showSnackBar(
                           //       SnackBar(
                           //         content: Text(
-                          //           'Please select a gender',
+                          //           'Please select a vehicle brand',
                           //           style: AppTextStyles.bodyMedium.copyWith(
                           //             color: AppColors.white,
                           //           ),
@@ -458,8 +416,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           //   // Handle continue
                           //   Get.to(CardAddScreen());
                           // }
-                          //Get.to(CardAddScreen());
-                          Get.to(VehicleInformationScreen());
+                          Get.to(const DocumentUploadScreen());
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,

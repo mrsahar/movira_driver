@@ -17,7 +17,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final PageController _pageController = PageController();
 
   final List<Widget> _screens = [
-    const HomeTabScreen(),
+    const DriverHomeScreen(),
     const HistoryTabScreen(),
     const SettingsScreen(),
   ];
