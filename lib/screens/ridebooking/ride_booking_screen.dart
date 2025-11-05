@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:movira_driver/screens/review/rating_screen.dart';
-import 'package:movira_driver/screens/ridebooking/widgets/confirmation_bottom_sheet.dart';
-import 'package:movira_driver/screens/ridebooking/widgets/destination_bottom_sheet.dart';
-import 'package:movira_driver/screens/ridebooking/widgets/destination_reached_bottom_sheet.dart';
-import 'package:movira_driver/screens/ridebooking/widgets/driver_arriving_bottom_sheet.dart';
-import 'package:movira_driver/screens/ridebooking/widgets/finding_driver_bottom_sheet.dart';
-import 'package:movira_driver/screens/ridebooking/widgets/pickup_bottom_sheet.dart';
-import 'package:movira_driver/screens/ridebooking/widgets/sos_bottom_sheet.dart';
-import 'package:movira_driver/screens/ridebooking/widgets/trip_progress_bottom_sheet.dart';
-import 'package:movira_driver/screens/ridebooking/widgets/type_select_bottom_sheet.dart';
+import 'package:movira_driver/screens/ridebooking/widgets/heading_to_pickup_bottom_sheet.dart';
+import 'package:movira_driver/screens/ridebooking/widgets/pickup_location_bottom_sheet.dart';
+import 'package:movira_driver/screens/ridebooking/widgets/ride_completed_bottom_sheet.dart';
 import 'package:movira_driver/utils/constants/colors.dart';
-import 'package:movira_driver/utils/text_style.dart';
 import 'package:movira_driver/utils/map_theme.dart';
 import 'package:movira_driver/utils/widgets/my_app_bar.dart';
+
+import '../home/delivery_receipt_screen.dart';
 
 // Bottom Sheet Types Enum
 enum BottomSheetType {
@@ -29,11 +22,6 @@ enum BottomSheetType {
   tripProgress,
   sos,
   destinationReached,
-  // TODO: Add more bottom sheet types here as needed
-  // rating,
-  // paymentDetails,
-  // tripHistory,
-  // etc.
 }
 
 class RideBookingScreen extends StatefulWidget {
@@ -51,6 +39,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> {
   final Set<Marker> _markers = {};
   bool _isLoading = true;
 
+
   // Search controllers for different bottom sheets
   final TextEditingController _pickupSearchController = TextEditingController();
   final TextEditingController _destinationSearchController = TextEditingController();
@@ -59,16 +48,16 @@ class _RideBookingScreenState extends State<RideBookingScreen> {
   bool _showSearchResults = false;
 
   // Current bottom sheet being displayed
-  BottomSheetType _currentBottomSheet = BottomSheetType.pickup;
+  BottomSheetType _currentBottomSheet = BottomSheetType.driverArriving;
 
   // Addresses
   String? _pickupAddress;
   String? _destinationAddress;
 
   // Booking details
-  String _selectedCarType = 'Mini Car';
-  double _baseFare = 95.0;
-  double _platformCharges = 5.0;
+  String selectedCarType = 'Mini Car';
+  double baseFare = 95.0;
+  double platformCharges = 5.0;
 
   @override
   void initState() {
@@ -465,160 +454,92 @@ class _RideBookingScreenState extends State<RideBookingScreen> {
     );
   }
 
-  // Build current bottom sheet based on state
+  // Add this method to your _RideBookingScreenState class
+
   Widget _buildCurrentBottomSheet() {
     switch (_currentBottomSheet) {
-    // 1. Pickup Location Selection
-      case BottomSheetType.pickup:
-        return PickupBottomSheet(
-          searchController: _pickupSearchController,
-          onSearchChanged: _searchLocation,
-          onConfirm: _goToNextBottomSheet,
-          searchResults: _searchResults,
-          onResultTap: _selectSearchResult,
-          showSearchResults: _showSearchResults,
-        );
-
-    // 2. Destination Selection
-      case BottomSheetType.destination:
-        return DestinationBottomSheet(
-          searchController: _destinationSearchController,
-          onSearchChanged: _searchLocation,
-          onConfirm: _goToNextBottomSheet,
-          searchResults: _searchResults,
-          onResultTap: _selectSearchResult,
-          showSearchResults: _showSearchResults,
-        );
-
-    // 3. Type Selection (Ride/Package + Car Type)
-      case BottomSheetType.typeSelection:
-        return TypeSelectionBottomSheet(
-          pickupAddress: _pickupAddress,
-          dropOffAddress: _destinationAddress,
-          onPickupTap: () => _switchToBottomSheet(BottomSheetType.pickup),
-          onDropOffTap: () => _switchToBottomSheet(BottomSheetType.destination),
-          onConfirm: _goToNextBottomSheet,
-        );
-
-    // 4. Confirmation Screen
-      case BottomSheetType.confirmation:
-        return ConfirmationBottomSheet(
-          pickupAddress: _pickupAddress ?? 'Unknown Location',
-          dropOffAddress: _destinationAddress ?? 'Unknown Location',
-          carType: _selectedCarType,
-          baseFare: _baseFare,
-          platformCharges: _platformCharges,
-          onConfirm: _goToNextBottomSheet,
-        );
-
-    // 5. Finding Driver
-      case BottomSheetType.findingDriver:
-        return FindingDriverBottomSheet(
-          pickupAddress: _pickupAddress ?? 'Unknown Location',
-          dropOffAddress: _destinationAddress ?? 'Unknown Location',
-          estimatedTime: '30 mins',
-          distance: '14.2 KM',
-          baseFare: _baseFare,
-          platformCharges: _platformCharges,
-          onCancel: () {
-            setState(() {
-              _currentBottomSheet = BottomSheetType.typeSelection;
-            });
-          },
-        );
-
-    // 6. Driver Arriving
       case BottomSheetType.driverArriving:
-        return DriverArrivingBottomSheet(
+        return HeadingToPickupBottomSheet(
           driverName: 'Marvin McKinney',
-          driverImage: 'assets/images/driver.png',
-          rating: 4.5,
-          carModel: 'Chevrolet Tornado',
-          carPlate: 'ES-345-LJ5',
-          arrivalTime: '5 minutes',
-          approximatePrice: _baseFare + _platformCharges,
-          onMessage: () {
-            print('Message driver');
-            // TODO: Implement messaging
-          },
-          onCall: () {
-            print('Call driver');
-            // TODO: Implement calling
-          },
-        );
-
-    // 7. Trip in Progress
-      case BottomSheetType.tripProgress:
-        return TripProgressBottomSheet(
-          driverName: 'Marvin McKinney',
-          driverImage: 'assets/images/driver.png',
-          rating: 4.5,
-          carModel: 'Chevrolet Tornado',
-          carPlate: 'ES-345-LJ5',
-          approximatePrice: _baseFare + _platformCharges,
-          onMessage: () {
-            print('Message driver');
-          },
-          onCall: () {
-            print('Call driver');
-          },
-          onEmergencySOS: () {
-            _switchToBottomSheet(BottomSheetType.sos);
-          },
-        );
-
-    // 8. Emergency SOS
-      case BottomSheetType.sos:
-        return SosBottomSheet(
-          onCall911: () {
-            print('Calling 911...');
-            // TODO: Implement emergency call
-          },
-          onShareLocation: () {
-            print('Sharing live location...');
-            // TODO: Implement location sharing
-          },
-          onAlertSupport: () {
-            print('Alerting Movira support...');
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Support team has been alerted!'),
-                backgroundColor: AppColors.green,
-              ),
-            );
-            // Go back to trip progress
+          driverImage: 'assets/images/profile_user.png',
+          pickupAddress: _pickupAddress ?? 'Maryland bustop, Anthony Ikeja',
+          dropAddress: _destinationAddress ?? '6391 Elgin St, Celina, Delaware 10299',
+          approximatePrice: '\$54',
+          estimatedTime: '2 mins',
+          onReachedDestination: () {
             setState(() {
               _currentBottomSheet = BottomSheetType.tripProgress;
             });
           },
-        );
-
-    // 9. Destination Reached
-      case BottomSheetType.destinationReached:
-        return DestinationReachedBottomSheet(
-          driverName: 'Marvin McKinney',
-          driverImage: 'assets/images/driver.png',
-          rating: 4.5,
-          carModel: 'Chevrolet Tornado',
-          carPlate: 'ES-345-LJ5',
-          approximatePrice: _baseFare + _platformCharges,
-          onRateExperience: () {
-            print('Rate experience tapped');
-            // TODO: Navigate to rating screen
-            Get.to(RatingReviewScreen());
+          onCall: () {
+            print('Calling driver...');
+            // Add call functionality
+          },
+          onMessage: () {
+            print('Messaging driver...');
+            // Add message functionality
           },
         );
- 
+
+      case BottomSheetType.tripProgress:
+        return PickupLocationBottomSheet(
+          driverName: 'Marvin McKinney',
+          driverImage: 'assets/images/profile_user.png',
+          pickupAddress: _pickupAddress ?? 'Maryland bustop, Anthony Ikeja',
+          dropAddress: _destinationAddress ?? '6391 Elgin St, Celina, Delaware 10299',
+          approximatePrice: '\$54',
+          estimatedTime: '2 mins',
+          onReachedDestination: () {
+            setState(() {
+              _currentBottomSheet = BottomSheetType.destinationReached;
+            });
+          },
+          onCall: () {
+            print('Calling driver...');
+            // Add call functionality
+          },
+          onMessage: () {
+            print('Messaging driver...');
+            // Add message functionality
+          },
+        );
+
+      case BottomSheetType.destinationReached:
+        return RideCompletedBottomSheet(
+          onRateRider: () {
+            print('Rate rider');
+            // Navigate to rating screen
+            Navigator.pop(context);
+          },
+          onSkip: () {
+            print('Skipped rating');
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DeliveryReceiptScreen(
+                  driverName: 'Marvin McKinney',
+                  driverImage: 'assets/images/profile_user.png',
+                  trackingId: 'UD32499983',
+                  fromAddress: '1213 Washington Blvd, Belpre, OH',
+                  toAddress: '121 Pike St, Marietta, OH',
+                  date: '2 Sep, 2023',
+                  time: '12:00 am',
+                  rating: 4.0,
+                  reviewText: 'Great customer! The passenger was punctual, polite, and respectful throughout the trip. Communication was smooth and pleasant. Highly recommend for future rides. Would definitely drive again. Thank you!"',
+                  baseFare: 10,
+                  distanceCharges: 40,
+                  serviceFees: 10,
+                  gasSurcharges: 10,
+                  totalCost: 330,
+                  isDelivered: true,
+                ),
+              ),
+            );
+          },
+        );
 
       default:
-        return PickupBottomSheet(
-          searchController: _pickupSearchController,
-          onSearchChanged: _searchLocation,
-          onConfirm: _goToNextBottomSheet,
-          searchResults: _searchResults,
-          onResultTap: _selectSearchResult,
-          showSearchResults: _showSearchResults,
-        );
+        return Container(); // Return your existing bottom sheets for other states
     }
   }
 }

@@ -6,6 +6,8 @@ import 'package:movira_driver/screens/home/widget/ride_request_card.dart';
 import 'package:movira_driver/utils/constants/colors.dart';
 import 'package:movira_driver/utils/text_style.dart';
 
+import '../ridebooking/ride_booking_screen.dart';
+
 class DriverHomeScreen extends StatefulWidget {
   const DriverHomeScreen({super.key});
 
@@ -227,6 +229,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                             GestureDetector(
                               onTap: () {
                                 // Navigate to all requests
+                                Get.to(RideBookingScreen());
                               },
                               child: Row(
                                 children: [
